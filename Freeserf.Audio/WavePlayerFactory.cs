@@ -14,8 +14,8 @@ namespace Freeserf.Audio
 
         public Audio.Player GetWavePlayer()
         {
-            if (player == null)
-                player = new Bass.WavePlayer(dataSource);
+            //if (player == null)
+            //    player = new Bass.WavePlayer(dataSource);
 
             return player;
         }

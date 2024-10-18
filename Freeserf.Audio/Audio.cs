@@ -14,19 +14,6 @@ namespace Freeserf.Audio
         {
             try
             {
-                if (RefCount++ == 0)
-                {
-                    // Init Bass if it is used
-                    Bass.BassLib.EnsureBass();
-                }
-
-                // If Bass should be used but it is not initialized, the sound is disabled
-                if (!Bass.BassLib.Initialized)
-                {
-                    DisableSound();
-                    return;
-                }
-
                 musicPlayer = DataSource.DosMusic(dataSource)
                     ? new MidiPlayerFactory(dataSource).GetMidiPlayer()
                     : new ModPlayerFactory(dataSource).GetModPlayer();
@@ -102,8 +89,8 @@ namespace Freeserf.Audio
         {
             if (--RefCount == 0)
             {
-                // Free Bass resources
-                Bass.BassLib.FreeBass();
+
+    
             }
         }
 

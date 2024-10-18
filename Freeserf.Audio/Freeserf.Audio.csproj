@@ -68,21 +68,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Bass\ChoriumRevA.SF2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Bass\ChoriumRevA.SF2">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Silk.NET.Input.Glfw" Version="2.21.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Freeserf.Core\Freeserf.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Bass\" />
   </ItemGroup>
 
 </Project>

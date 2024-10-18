@@ -1,4 +1,5 @@
-﻿using Freeserf.Data;
+﻿using Freeserf.Audio.NAudio;
+using Freeserf.Data;
 
 namespace Freeserf.Audio
 {
@@ -15,7 +16,7 @@ namespace Freeserf.Audio
         public Audio.Player GetMidiPlayer()
         {
             if (player == null)
-                player = new Bass.MidiPlayer(dataSource);
+                player = new MidiPlayer(dataSource);
 
             return player;
         }

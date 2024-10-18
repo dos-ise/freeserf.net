@@ -14,8 +14,8 @@ namespace Freeserf.Audio
 
         public Audio.Player GetModPlayer()
         {
-            if (player == null)
-                player = new Bass.ModPlayer(dataSource);
+            //if (player == null)
+                //player = new Bass.ModPlayer(dataSource);
 
             return player;
         }
