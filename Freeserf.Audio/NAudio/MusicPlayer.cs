@@ -26,11 +26,11 @@ namespace Freeserf.Audio.NAudio
 
                 if (enabled && currentChannel != 0)
                 {
-                    BassLib.Play(currentChannel, true);
-                    BassLib.StartAll();
+                    //BassLib.Play(currentChannel, true);
+                    //BassLib.StartAll();
                 }
-                else if (!enabled)
-                    BassLib.Stop(currentChannel);
+                //else if (!enabled)
+                    //BassLib.Stop(currentChannel);
             }
         }
 
@@ -41,8 +41,8 @@ namespace Freeserf.Audio.NAudio
             {
                 volume = Misc.Clamp(0.0f, value, 1.0f);
 
-                if (currentChannel != 0)
-                    BassLib.SetVolume(currentChannel, volume);
+                //if (currentChannel != 0)
+                    //BassLib.SetVolume(currentChannel, volume);
             }
         }
 
@@ -58,16 +58,16 @@ namespace Freeserf.Audio.NAudio
 
         public override void Stop()
         {
-            if (enabled && currentChannel != 0)
-                BassLib.Stop(currentChannel);
+            //if (enabled && currentChannel != 0)
+                //BassLib.Stop(currentChannel);
         }
 
         internal void SetCurrentChannel(int channel)
         {
             currentChannel = channel;
 
-            if (currentChannel != 0) // use set volume for the new channel
-                BassLib.SetVolume(currentChannel, Volume);
+            //if (currentChannel != 0) // use set volume for the new channel
+            //    BassLib.SetVolume(currentChannel, Volume);
         }
 
         public void VolumeDown()
