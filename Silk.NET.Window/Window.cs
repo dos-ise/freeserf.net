@@ -1,4 +1,5 @@
-﻿using Silk.NET.Core.Contexts;
+﻿using Silk.NET.Core;
+using Silk.NET.Core.Contexts;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
@@ -277,6 +278,8 @@ namespace Silk.NET.Window
         public void MakeCurrent() => window?.MakeCurrent();
 
         public void SwapBuffers() => window?.SwapBuffers();
+
+        public void SetWindowIcon(ref RawImage icon) => WindowExtensions.SetWindowIcon(window, ref icon);
 
         private void InitEvents()
         {
