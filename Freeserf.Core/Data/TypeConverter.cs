@@ -28,7 +28,7 @@ namespace Freeserf.Data
     {
         public TypeConverter(ulong Value)
         {
-            field.UlongValue = Value;
+            _field.UlongValue = Value;
         }
 
         public TypeConverter() : this(0)
@@ -37,12 +37,12 @@ namespace Freeserf.Data
 
         public ulong Field
         {
-            set { field.UlongValue = value; }
-            get { return field.UlongValue; }
+            set { _field.UlongValue = value; }
+            get { return _field.UlongValue; }
         }
 
 
-        ULongStruct field;
+        ULongStruct _field;
 
         [StructLayout(LayoutKind.Explicit)]
         struct ULongStruct
@@ -82,82 +82,82 @@ namespace Freeserf.Data
 
         bool IConvertible.ToBoolean(IFormatProvider provider)
         {
-            return field.ByteValue != 0;
+            return _field.ByteValue != 0;
         }
 
         byte IConvertible.ToByte(IFormatProvider provider)
         {
-            return field.ByteValue;
+            return _field.ByteValue;
         }
 
         char IConvertible.ToChar(IFormatProvider provider)
         {
-            return (char)field.SByteValue;
+            return (char)_field.SByteValue;
         }
 
         DateTime IConvertible.ToDateTime(IFormatProvider provider)
         {
-            return Convert.ToDateTime(field.UlongValue);
+            return Convert.ToDateTime(_field.UlongValue);
         }
 
         decimal IConvertible.ToDecimal(IFormatProvider provider)
         {
-            return Convert.ToDecimal(field.DoubleValue);
+            return Convert.ToDecimal(_field.DoubleValue);
         }
 
         double IConvertible.ToDouble(IFormatProvider provider)
         {
-            return field.DoubleValue;
+            return _field.DoubleValue;
         }
 
         short IConvertible.ToInt16(IFormatProvider provider)
         {
-            return field.ShortValue;
+            return _field.ShortValue;
         }
 
         int IConvertible.ToInt32(IFormatProvider provider)
         {
-            return field.IntValue;
+            return _field.IntValue;
         }
 
         long IConvertible.ToInt64(IFormatProvider provider)
         {
-            return (long)field.UlongValue;
+            return (long)_field.UlongValue;
         }
 
         sbyte IConvertible.ToSByte(IFormatProvider provider)
         {
-            return field.SByteValue;
+            return _field.SByteValue;
         }
 
         float IConvertible.ToSingle(IFormatProvider provider)
         {
-            return field.FloatValue;
+            return _field.FloatValue;
         }
 
         string IConvertible.ToString(IFormatProvider provider)
         {
-            return String.Format("({0})", field.UlongValue);
+            return String.Format("({0})", _field.UlongValue);
         }
 
         object IConvertible.ToType(Type conversionType, IFormatProvider provider)
         {
-            return Convert.ChangeType(field.UlongValue, conversionType);
+            return Convert.ChangeType(_field.UlongValue, conversionType);
         }
 
         ushort IConvertible.ToUInt16(IFormatProvider provider)
         {
-            return field.UShortValue;
+            return _field.UShortValue;
         }
 
         uint IConvertible.ToUInt32(IFormatProvider provider)
         {
-            return field.UIntValue;
+            return _field.UIntValue;
         }
 
         ulong IConvertible.ToUInt64(IFormatProvider provider)
         {
-            return field.UlongValue;
+            return _field.UlongValue;
         }
     }
 }
