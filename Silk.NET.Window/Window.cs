@@ -121,7 +121,7 @@ namespace Silk.NET.Window
                 {
                     var monitor = window.Monitor;
 
-                    window.WindowState = WindowState.Normal;
+                    window.WindowState = WindowState.Fullscreen;
                     window.WindowBorder = WindowBorder.Fixed;
                     fullscreen = true;
 
