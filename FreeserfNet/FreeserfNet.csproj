@@ -70,7 +70,12 @@
 
   <ItemGroup>
     <None Remove="freeserf.log" />
+    <None Remove="icon.png" />
     <None Remove="*.PA" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icon.png" />
   </ItemGroup>
 
   <ItemGroup>
