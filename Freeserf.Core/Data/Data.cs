@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Freeserf.Data
 {
@@ -236,7 +237,7 @@ namespace Freeserf.Data
             addEnvPath(Environment.GetEnvironmentVariable("HOME"), ".local/share/freeserf");
             addEnvPath(Environment.GetEnvironmentVariable("HOME"), ".local/share/freeserf/custom");
 
-            if (Environment.OSVersion.Platform == PlatformID.Win32Windows)
+            if (Environment.OSVersion.Platform == PlatformID.Win32Windows || Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
                 // Look in the same directory as the freeserf.exe app.
                 addEnvPath(AppContext.BaseDirectory, "../");
@@ -244,6 +245,10 @@ namespace Freeserf.Data
                 // Look in windows XDG_DATA_HOME equivalents.
                 addEnvPath(Environment.GetEnvironmentVariable("userprofile"), ".local/share/freeserf");
                 addEnvPath(Environment.GetEnvironmentVariable("LOCALAPPDATA"), "freeserf");
+
+                //Default Ubisoft History Edition Path
+                var ubisoftPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Ubisoft", "Ubisoft Game Launcher", "games", "thesettlers", "loca");
+                paths.Add(ubisoftPath);
             }
             else
             {
