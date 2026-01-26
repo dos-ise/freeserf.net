@@ -45,7 +45,8 @@ namespace Freeserf.Renderer
 
             var match = versionRegex.Match(openGLVersion);
 
-            if (!match.Success || match.Index != 0 || match.Groups.Count < 3)
+            //Some linux distros report gl like this "OpenGL ES 3.2 v1.r54p1-11eac0.bf6659b634cc4428261e868dd766545b" therefor we can not assume the match is at index 0
+            if (!match.Success || match.Groups.Count < 3)
             {
                 throw new Exception("OpenGL is not supported or the version could not be determined.");
             }
