@@ -49,9 +49,8 @@ namespace Freeserf.Renderer
 
         protected static string GetFragmentShaderHeader()
         {
-            string header = $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor}\n";
+            string header = GetVertexShaderHeader();
 
-            header += "\n";
             header += "#ifdef GL_ES\n";
             header += " precision mediump float;\n";
             header += " precision highp int;\n";
@@ -66,7 +65,7 @@ namespace Freeserf.Renderer
 
         protected static string GetVertexShaderHeader()
         {
-            return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor}\n\n";
+            return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} {State.GLSLVersionSuffix}\n\n";
         }
 
         protected static string GetInName(bool fragment)
