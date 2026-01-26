@@ -41,23 +41,108 @@ namespace Freeserf.Renderer
         readonly string positionName;
         readonly string layerName;
 
-        // gl_FragColor is deprecated beginning in GLSL version 1.30
+        // ---------------------------------------------------------------------
+        // Unified GLSL / GLES helpers
+        // ---------------------------------------------------------------------
+
+        private static bool IsGLES()
+        {
+            return !string.IsNullOrEmpty(State.GLSLVersionSuffix) &&
+                   State.GLSLVersionSuffix.ToLower().Contains("es");
+        }
+
+        private static bool IsLegacyGL()
+        {
+            // Desktop GLSL < 1.30
+            return !IsGLES() && State.GLSLVersionMajor == 1 && State.GLSLVersionMinor < 3;
+        }
+
+        private static string GLSLVersionHeader()
+        {
+            if (IsGLES())
+            {
+                // GLES 2.0 → GLSL ES 1.00
+                if (State.GLSLVersionMajor == 1 && State.GLSLVersionMinor == 0)
+                {
+                    return "#version 100\n" +
+                           "precision mediump float;\n" +
+                           "precision mediump int;\n\n";
+                }
+
+                // GLES 3.x → e.g. #version 300 es
+                return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} es\n" +
+                       "precision mediump float;\n" +
+                       "precision mediump int;\n\n";
+            }
+
+            // Desktop GL: keep original style
+            return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} {State.GLSLVersionSuffix}\n\n";
+        }
+
+        private static string InQualifier(bool fragment)
+        {
+            if (IsLegacyGL())
+                return fragment ? "varying" : "attribute";
+
+            return "in";
+        }
+
+        private static string OutQualifier()
+        {
+            if (IsLegacyGL())
+                return "varying";
+
+            return "out";
+        }
+
+        private static bool SupportsFlat()
+        {
+            if (IsLegacyGL())
+                return false;
+
+            if (IsGLES() && State.GLSLVersionMajor < 3)
+                return false;
+
+            return true;
+        }
+
+        private static bool SupportsIntegerAttributes()
+        {
+            if (IsLegacyGL())
+                return false;
+
+            if (IsGLES() && State.GLSLVersionMajor < 3)
+                return false;
+
+            return true;
+        }
+
+        private static bool UsesLegacyFragColor()
+        {
+            // Desktop GLSL < 1.30 or GLES 2.0 → gl_FragColor
+            if (IsLegacyGL())
+                return true;
+
+            if (IsGLES() && State.GLSLVersionMajor < 3)
+                return true;
+
+            return false;
+        }
+
+        // ---------------------------------------------------------------------
+        // Compatibility layer for old API (names used in this file)
+        // ---------------------------------------------------------------------
+
         protected static bool HasGLFragColor()
         {
-            return State.GLSLVersionMajor == 1 && State.GLSLVersionMinor < 3;
+            return UsesLegacyFragColor();
         }
 
         protected static string GetFragmentShaderHeader()
         {
-            string header = GetVertexShaderHeader();
+            string header = GLSLVersionHeader();
 
-            header += "#ifdef GL_ES\n";
-            header += " precision mediump float;\n";
-            header += " precision highp int;\n";
-            header += "#endif\n";
-            header += "\n";
-
-            if (!HasGLFragColor())
+            if (!UsesLegacyFragColor())
                 header += $"out vec4 {DefaultFragmentOutColorName};\n";
 
             return header;
@@ -65,60 +150,116 @@ namespace Freeserf.Renderer
 
         protected static string GetVertexShaderHeader()
         {
-            return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} {State.GLSLVersionSuffix}\n\n";
+            return GLSLVersionHeader();
         }
 
         protected static string GetInName(bool fragment)
         {
-            if (State.GLSLVersionMajor == 1 && State.GLSLVersionMinor < 3)
-            {
-                if (fragment)
-                    return "varying";
-                else
-                    return "attribute";
-            }
-            else
-                return "in";
+            return InQualifier(fragment);
         }
 
         protected static string GetOutName()
         {
-            if (State.GLSLVersionMajor == 1 && State.GLSLVersionMinor < 3)
-                return "varying";
-            else
-                return "out";
+            return OutQualifier();
         }
+
+        // ---------------------------------------------------------------------
+        // Unified shader generators (used via the arrays below)
+        // ---------------------------------------------------------------------
+
+        private static string GenerateVertexShader()
+        {
+            string header = GLSLVersionHeader();
+
+            bool ints = SupportsIntegerAttributes();
+            bool flat = SupportsFlat();
+
+            string posType = ints ? "ivec2" : "vec2";
+            string layerType = ints ? "uint" : "float";
+            string colorType = ints ? "uvec4" : "vec4";
+
+            string varying = flat ? "flat " + OutQualifier() : OutQualifier();
+
+            string layerDecl = ints
+                ? $"    float layer = float({DefaultLayerName});"
+                : $"    float layer = {DefaultLayerName};";
+
+            string posExpr = ints
+                ? $"    vec2 pos = vec2(float({DefaultPositionName}.x) + 0.49, float({DefaultPositionName}.y) + 0.49);"
+                : $"    vec2 pos = {DefaultPositionName} + vec2(0.49, 0.49);";
+
+            string colorExpr = ints
+                ? $"    pixelColor = vec4({DefaultColorName}.r / 255.0, {DefaultColorName}.g / 255.0, {DefaultColorName}.b / 255.0, {DefaultColorName}.a / 255.0);"
+                : $"    pixelColor = {DefaultColorName} / 255.0;";
+
+            return string.Join("\n", new[]
+            {
+                header,
+                $"{InQualifier(false)} {posType} {DefaultPositionName};",
+                $"{InQualifier(false)} {layerType} {DefaultLayerName};",
+                $"{InQualifier(false)} {colorType} {DefaultColorName};",
+                $"uniform float {DefaultZName};",
+                $"uniform mat4 {DefaultProjectionMatrixName};",
+                $"uniform mat4 {DefaultModelViewMatrixName};",
+                $"{varying} vec4 pixelColor;",
+                "",
+                "void main()",
+                "{",
+                posExpr,
+                colorExpr,
+                layerDecl,
+                $"    gl_Position = {DefaultProjectionMatrixName} * {DefaultModelViewMatrixName} * vec4(pos, 1.0 - {DefaultZName} - layer * 0.00001, 1.0);",
+                "}"
+            });
+        }
+
+        private static string GenerateFragmentShader()
+        {
+            string header = GLSLVersionHeader();
+
+            bool flat = SupportsFlat();
+            bool legacyFragColor = UsesLegacyFragColor();
+
+            string varying = flat ? "flat " + InQualifier(true) : InQualifier(true);
+
+            string outputDecl = legacyFragColor
+                ? ""
+                : $"out vec4 {DefaultFragmentOutColorName};\n";
+
+            string outputAssign = legacyFragColor
+                ? "gl_FragColor = pixelColor;"
+                : $"{DefaultFragmentOutColorName} = pixelColor;";
+
+            return string.Join("\n", new[]
+            {
+                header,
+                outputDecl,
+                $"{varying} vec4 pixelColor;",
+                "",
+                "void main()",
+                "{",
+                $"    {outputAssign}",
+                "}"
+            });
+        }
+
+        // ---------------------------------------------------------------------
+        // Static shader arrays (kept for constructor compatibility)
+        // ---------------------------------------------------------------------
 
         static readonly string[] ColorFragmentShader = new string[]
         {
-            GetFragmentShaderHeader(),
-            $"flat {GetInName(true)} vec4 pixelColor;",
-            $"",
-            $"void main()",
-            $"{{",
-            $"    {(HasGLFragColor() ? "gl_FragColor" : DefaultFragmentOutColorName)} = pixelColor;",
-            $"}}"
+            GenerateFragmentShader()
         };
 
         static readonly string[] ColorVertexShader = new string[]
         {
-            GetVertexShaderHeader(),
-            $"{GetInName(false)} ivec2 {DefaultPositionName};",
-            $"{GetInName(false)} uint {DefaultLayerName};",
-            $"{GetInName(false)} uvec4 {DefaultColorName};",
-            $"uniform float {DefaultZName};",
-            $"uniform mat4 {DefaultProjectionMatrixName};",
-            $"uniform mat4 {DefaultModelViewMatrixName};",
-            $"flat {GetOutName()} vec4 pixelColor;",
-            $"",
-            $"void main()",
-            $"{{",
-            $"    vec2 pos = vec2(float({DefaultPositionName}.x) + 0.49f, float({DefaultPositionName}.y) + 0.49f);",
-            $"    pixelColor = vec4({DefaultColorName}.r / 255.0f, {DefaultColorName}.g / 255.0f, {DefaultColorName}.b / 255.0f, {DefaultColorName}.a / 255.0f);",
-            $"    ",
-            $"    gl_Position = {DefaultProjectionMatrixName} * {DefaultModelViewMatrixName} * vec4(pos, 1.0f - {DefaultZName} - float({DefaultLayerName}) * 0.00001f, 1.0f);",
-            $"}}"
+            GenerateVertexShader()
         };
+
+        // ---------------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------------
 
         public void UpdateMatrices(bool zoom)
         {
@@ -140,13 +281,14 @@ namespace Freeserf.Renderer
             : this(DefaultModelViewMatrixName, DefaultProjectionMatrixName, DefaultColorName, DefaultZName,
                   DefaultPositionName, DefaultLayerName, ColorFragmentShader, ColorVertexShader)
         {
-
         }
 
         protected ColorShader(string modelViewMatrixName, string projectionMatrixName, string colorName, string zName,
             string positionName, string layerName, string[] fragmentShaderLines, string[] vertexShaderLines)
         {
-            fragmentOutColorName = (State.OpenGLVersionMajor > 2) ? DefaultFragmentOutColorName : "gl_FragColor";
+            bool legacyFragColor = UsesLegacyFragColor();
+
+            fragmentOutColorName = legacyFragColor ? "gl_FragColor" : DefaultFragmentOutColorName;
 
             this.modelViewMatrixName = modelViewMatrixName;
             this.projectionMatrixName = projectionMatrixName;
@@ -160,6 +302,7 @@ namespace Freeserf.Renderer
 
             shaderProgram = new ShaderProgram(fragmentShader, vertexShader);
 
+            // Option A: always call this; for legacy/GLES2 use "gl_FragColor"
             shaderProgram.SetFragmentColorOutputName(fragmentOutColorName);
         }
 
