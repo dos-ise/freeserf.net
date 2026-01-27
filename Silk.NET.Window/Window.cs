@@ -684,7 +684,10 @@ namespace Silk.NET.Window
         private const float BaseSpeed = 18f;
         private const float AccelExponent = 1.45f;
         private const float Deadzone = 0.12f;
-        
+
+        private const float TriggerDeadzone = 0.05f; 
+        private const float TriggerScrollStrength = 6.0f;
+
         private void InitGamepad(IInputContext input)
         {
             var pad = input.Gamepads.FirstOrDefault(g => g.IsConnected);
@@ -695,6 +698,35 @@ namespace Silk.NET.Window
             pad.ButtonDown += ButtonDown;
             pad.ButtonUp += ButtonUp;
             pad.ThumbstickMoved += ThumbstickMoved;
+            pad.TriggerMoved += TriggerMoved;
+        }
+
+        private void TriggerMoved(IGamepad pad, Trigger trigger)
+        {
+            // Trigger.Value ist 0.0 bis 1.0
+            float value = trigger.Position;
+
+            if (value < TriggerDeadzone)
+                return;
+
+            // Scrollrichtung bestimmen
+            float scrollDelta = 0f;
+
+            if (trigger.Index == 0) // LEFT TRIGGER
+            {
+                // Scroll nach unten
+                scrollDelta = -(value * TriggerScrollStrength);
+            }
+            else if (trigger.Index == 1) // RIGHT TRIGGER
+            {
+                // Scroll nach oben
+                scrollDelta = +(value * TriggerScrollStrength);
+            }
+
+            if (scrollDelta != 0f)
+            {
+                OnMouseWheel(ConvertMousePosition(CursorPosition), scrollDelta);
+            }
         }
 
         private void ButtonDown(IGamepad pad, Button button)
@@ -710,7 +742,7 @@ namespace Silk.NET.Window
                     break;
 
                 case ButtonName.X:
-                    Press(MouseButtons.Middle);
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), -1f);
                     break;
 
                 case ButtonName.Y:
@@ -724,15 +756,6 @@ namespace Silk.NET.Window
                 case ButtonName.LeftBumper:
                     OnMouseWheel(ConvertMousePosition(CursorPosition), -1f);
                     break;
-
-                //TODO Buttonname does not contain any trigger
-                //case ButtonName.RightTrigger:
-                //    Press(MouseButtons.Left); // Drag
-                //    break;
-
-                //case ButtonName.LeftTrigger:
-                //    Press(MouseButtons.Right); // Drag
-                //    break;
             }
         }
 
@@ -752,14 +775,6 @@ namespace Silk.NET.Window
                 case ButtonName.X:
                     Release(MouseButtons.Middle, fireClick: true);
                     break;
-
-                //case ButtonName.RightTrigger:
-                //    Release(MouseButtons.Left, fireClick: false);
-                //    break;
-
-                //case ButtonName.LeftTrigger:
-                //    Release(MouseButtons.Right, fireClick: false);
-                //    break;
             }
         }
 
@@ -817,7 +832,7 @@ namespace Silk.NET.Window
                 OnMouseMoveDelta(newPosInt, _pressedButtons, deltaInt);
                 OnMouseMoveDeltaPrecise(newPos, _pressedButtons, deltaPrecise);
             }
-            //error Operator '==' cannot be applied to operands of type 'Thumbstick' and 'Thumbstick'
+
             // Stick 1 = rechter Stick → Scroll
             if (stick.Index == pad.Thumbsticks[1].Index)
             {
