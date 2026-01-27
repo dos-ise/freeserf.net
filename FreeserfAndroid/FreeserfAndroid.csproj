@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net9.0-android</TargetFramework>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
@@ -9,7 +9,6 @@
 	
 	<ItemGroup>
 		<PackageReference Include="Silk.NET.Core" Version="2.22.0" />
-		<PackageReference Include="Silk.NET.Input" Version="2.22.0" />
 		<PackageReference Include="Silk.NET.OpenGL" Version="2.22.0" />
 		<PackageReference Include="Silk.NET.Windowing" Version="2.22.0" />
 	</ItemGroup>
