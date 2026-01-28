@@ -731,6 +731,11 @@ namespace Freeserf.Data
 
             if (!found)
             {
+                if (!Directory.Exists(path))
+                {
+                    return false;
+                }
+
                 var adfFiles = Directory.GetFiles(path, "*.adf");
 
                 Log.Info.Write(ErrorSystemType.Data, $"Looking for ADF files in '{path}'...");

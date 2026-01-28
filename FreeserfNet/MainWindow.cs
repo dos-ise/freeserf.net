@@ -19,15 +19,20 @@
  * along with freeserf.net. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Numerics;
 using Freeserf.Renderer;
+using Silk.NET.Core;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Window;
 using Silk.NET.Windowing;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using static Freeserf.CommandLine;
+
 
 namespace Freeserf
 {
@@ -224,7 +229,7 @@ namespace Freeserf
                     new VideoMode(),
                     24
                 );
-
+  
                 return mainWindow = new MainWindow(options);
             }
             catch (Exception ex)
@@ -232,6 +237,23 @@ namespace Freeserf
                 ReportException("Init", ex);
                 return null;
             }
+        }
+
+        public static RawImage LoadEmbeddedRawImage(string resourceName)
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            resourceName = asm.GetManifestResourceNames().FirstOrDefault(r => r.Contains(resourceName));
+
+            using var stream = asm.GetManifestResourceStream(resourceName)
+                ?? throw new Exception($"Resource not found: {resourceName}");
+
+            using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(stream);
+
+            // Copy pixels into a flat array
+            var data = new byte[image.Width * image.Height * 4];
+            image.CopyPixelDataTo(data);
+
+            return new RawImage(image.Width, image.Height, data);
         }
 
         private IMonitor GetMonitorByIndex(int index)
@@ -305,6 +327,9 @@ namespace Freeserf
 
                 MakeCurrent();
 
+                var icon = LoadEmbeddedRawImage("icon.png");
+                mainWindow.SetWindowIcon(ref icon);
+                
                 if (initInfo.Fullscreen == true)
                     SetFullscreen(true);
             }

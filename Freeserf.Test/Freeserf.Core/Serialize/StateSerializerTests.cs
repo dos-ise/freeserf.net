@@ -60,7 +60,7 @@ namespace Freeserf.Test.Freeserf.Core.Serialize
             stream.Position = 0;
             stream.Write(new byte[1] { 0 }, 0, 1); // overwrite 'F' with 0
 
-            Assert.ThrowsException<ExceptionFreeserf>(() => StateSerializer.Deserialize(new TestState(), stream),
+            Assert.Throws<ExceptionFreeserf>(() => StateSerializer.Deserialize(new TestState(), stream),
                 "Manipulated serialized state header does not throw exception on deserialization.");
         }
 
@@ -88,7 +88,7 @@ namespace Freeserf.Test.Freeserf.Core.Serialize
             using var stream = new MemoryStream();
             var state = new InvalidTestState_UnsupportedPropertyType();
 
-            Assert.ThrowsException<ExceptionFreeserf>(() => StateSerializer.Serialize(stream, state, true, true),
+            Assert.Throws<ExceptionFreeserf>(() => StateSerializer.Serialize(stream, state, true, true),
                 "Invalid state does not throw exception on serialization.");
         }
 
@@ -98,7 +98,7 @@ namespace Freeserf.Test.Freeserf.Core.Serialize
             using var stream = new MemoryStream();
             var state = new InvalidTestState_InvalidPropertyName();
 
-            Assert.ThrowsException<ExceptionFreeserf>(() => StateSerializer.Serialize(stream, state, true, true),
+            Assert.Throws<ExceptionFreeserf>(() => StateSerializer.Serialize(stream, state, true, true),
                 "Invalid state does not throw exception on serialization.");
         }
 
@@ -112,7 +112,7 @@ namespace Freeserf.Test.Freeserf.Core.Serialize
             StateSerializer.Serialize(stream, state, true, true);
             stream.Position = 0;
 
-            Assert.ThrowsException<ExceptionFreeserf>(() => StateSerializer.Deserialize(new InvalidTestState_UnsupportedArrayElementType(), stream),
+            Assert.Throws<ExceptionFreeserf>(() => StateSerializer.Deserialize(new InvalidTestState_UnsupportedArrayElementType(), stream),
                 "Invalid state does not throw exception on deserialization.");
         }
 

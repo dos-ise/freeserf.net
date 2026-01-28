@@ -1,4 +1,5 @@
-﻿using Silk.NET.Core.Contexts;
+﻿using Silk.NET.Core;
+using Silk.NET.Core.Contexts;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
@@ -120,7 +121,7 @@ namespace Silk.NET.Window
                 {
                     var monitor = window.Monitor;
 
-                    window.WindowState = WindowState.Normal;
+                    window.WindowState = WindowState.Fullscreen;
                     window.WindowBorder = WindowBorder.Fixed;
                     fullscreen = true;
 
@@ -278,6 +279,8 @@ namespace Silk.NET.Window
 
         public void SwapBuffers() => window?.SwapBuffers();
 
+        public void SetWindowIcon(ref RawImage icon) => WindowExtensions.SetWindowIcon(window, ref icon);
+
         private void InitEvents()
         {
             Load += () =>
@@ -285,6 +288,7 @@ namespace Silk.NET.Window
                 var input = window.CreateInput();
                 InitKeyboardEvents(input);
                 InitMouseEvents(input);
+                InitGamepad(input);
                 Initialized = true;
             };
         }
@@ -669,6 +673,176 @@ namespace Silk.NET.Window
         /// </summary>
         public event Action<Vector2D<int>, float> MouseWheel;
 
+        #endregion
+
+
+        #region Gamepad Events
+
+        private static MouseButtons _pressedButtons = MouseButtons.None;
+
+        // Steam Deck Feeling
+        private const float BaseSpeed = 18f;
+        private const float AccelExponent = 1.45f;
+        private const float Deadzone = 0.12f;
+
+        private const float TriggerDeadzone = 0.05f; 
+        private const float TriggerScrollStrength = 6.0f;
+
+        private void InitGamepad(IInputContext input)
+        {
+            var pad = input.Gamepads.FirstOrDefault(g => g.IsConnected);
+
+            if (pad == null)
+                return;
+
+            pad.ButtonDown += ButtonDown;
+            pad.ButtonUp += ButtonUp;
+            pad.ThumbstickMoved += ThumbstickMoved;
+            pad.TriggerMoved += TriggerMoved;
+        }
+
+        private void TriggerMoved(IGamepad pad, Trigger trigger)
+        {
+            // Trigger.Value ist 0.0 bis 1.0
+            float value = trigger.Position;
+
+            if (value < TriggerDeadzone)
+                return;
+
+            // Scrollrichtung bestimmen
+            float scrollDelta = 0f;
+
+            if (trigger.Index == 0) // LEFT TRIGGER
+            {
+                // Scroll nach unten
+                scrollDelta = -(value * TriggerScrollStrength);
+            }
+            else if (trigger.Index == 1) // RIGHT TRIGGER
+            {
+                // Scroll nach oben
+                scrollDelta = +(value * TriggerScrollStrength);
+            }
+
+            if (scrollDelta != 0f)
+            {
+                OnMouseWheel(ConvertMousePosition(CursorPosition), scrollDelta);
+            }
+        }
+
+        private void ButtonDown(IGamepad pad, Button button)
+        {
+            switch (button.Name)
+            {
+                case ButtonName.A:
+                    Press(MouseButtons.Left);
+                    break;
+
+                case ButtonName.B:
+                    Press(MouseButtons.Right);
+                    break;
+
+                case ButtonName.X:
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), -1f);
+                    break;
+
+                case ButtonName.Y:
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), 1f);
+                    break;
+
+                case ButtonName.RightBumper:
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), 1f);
+                    break;
+
+                case ButtonName.LeftBumper:
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), -1f);
+                    break;
+            }
+        }
+
+
+        private void ButtonUp(IGamepad pad, Button button)
+        {
+            switch (button.Name)
+            {
+                case ButtonName.A:
+                    Release(MouseButtons.Left, fireClick: true);
+                    break;
+
+                case ButtonName.B:
+                    Release(MouseButtons.Right, fireClick: true);
+                    break;
+
+                case ButtonName.X:
+                    Release(MouseButtons.Middle, fireClick: true);
+                    break;
+            }
+        }
+
+        private void Press(MouseButtons button)
+        {
+            if ((_pressedButtons & button) != 0)
+                return;
+
+            _pressedButtons |= button;
+            OnMouseDown(ConvertMousePosition(CursorPosition), _pressedButtons);
+        }
+
+        private void Release(MouseButtons button, bool fireClick)
+        {
+            if ((_pressedButtons & button) == 0)
+                return;
+
+            _pressedButtons &= ~button;
+            OnMouseUp(ConvertMousePosition(CursorPosition), _pressedButtons);
+
+            if (fireClick)
+                OnClick(ConvertMousePosition(CursorPosition), button);
+        }
+
+        private void ThumbstickMoved(IGamepad pad, Thumbstick stick)
+        {            
+            // Stick 0 = linker Stick
+            if (stick.Index == pad.Thumbsticks[0].Index)
+            {
+                float x = pad.Thumbsticks[0].X;
+                float y = pad.Thumbsticks[0].Y;
+
+                float magnitude = MathF.Sqrt(x * x + y * y);
+                if (magnitude < Deadzone)
+                    return;
+
+                float normalized = (magnitude - Deadzone) / (1f - Deadzone);
+                normalized = Math.Clamp(normalized, 0f, 1f);
+
+                float accel = MathF.Pow(normalized, AccelExponent);
+
+                float dx = x * BaseSpeed * accel;
+                float dy = y * BaseSpeed * accel;
+
+                var oldPos = CursorPosition;
+                CursorPosition += new Vector2(dx, dy);
+
+                var newPos = CursorPosition;
+                var deltaPrecise = newPos - oldPos;
+                var newPosInt = ConvertMousePosition(CursorPosition);
+                var deltaInt = new Vector2D<int>((int)deltaPrecise.X, (int)deltaPrecise.Y);
+
+                OnMouseMove(newPosInt, _pressedButtons);
+                OnMouseMovePrecise(newPos, _pressedButtons);
+                OnMouseMoveDelta(newPosInt, _pressedButtons, deltaInt);
+                OnMouseMoveDeltaPrecise(newPos, _pressedButtons, deltaPrecise);
+            }
+
+            // Stick 1 = rechter Stick → Scroll
+            if (stick.Index == pad.Thumbsticks[1].Index)
+            {
+                var y = pad.Thumbsticks[1].Y;
+
+                if (Math.Abs(y) > 0.2f)
+                    OnMouseWheel(ConvertMousePosition(CursorPosition), (float)(-y * 5.0));
+            }
+        }
+        
         #endregion
     }
 }
