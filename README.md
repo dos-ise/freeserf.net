@@ -13,9 +13,9 @@ Freeserf.net is a C# port and extension of [freeserf](https://github.com/freeser
 
 | Windows | Linux |
 | ---- | ---- |
-| [v2.2.2](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.2/Freeserf.net-Windows.zip "Windows v2.2.2") | [v2.2.2](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.2/Freeserf.net-Linux.tar.gz "Linux v2.2.2") |
+| [v2.2.3](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.3/Freeserf.net-Windows.zip "Windows v2.2.3") | [v2.2.3](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.3/Freeserf.net-Linux.tar.gz "Linux v2.2.3") |
 
-Latest version 2.2.2 was released on 19th of May 2025.
+Latest version 2.2.3 was released on 28th of January 2026.
 
 Builds for other platforms will follow later. Only recent Ubuntu versions are tested for Linux version.
 
@@ -104,6 +104,14 @@ The main program is based on netcore 3.1 and should run at least on Windows and 
 If you need help or want to help developing, just [contact me](mailto:trobt@web.de). You can also contact me via [Issue Tracker](https://github.com/Pyrdacor/freeserf.net/issues) by adding a new issue and tag it as question.
 
 There is a more or less up-to-date [list with open issues](https://github.com/Pyrdacor/freeserf.net/blob/master/Issues.md) of several relevances and importances.
+
+Thanks to the following devs for their contributions:
+
+- dos-ise (https://github.com/dos-ise)
+- Andrzej J. Skalski (https://github.com/njskalski)
+- Christopherianos
+- noxdk
+- athach
 
 
 ## Ingame key shortcuts
