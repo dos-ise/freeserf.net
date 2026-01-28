@@ -19,4 +19,8 @@
 		<ProjectReference Include="..\Freeserf.Network\Freeserf.Network.csproj" />
 		<ProjectReference Include="..\Freeserf.Renderer\Freeserf.Renderer.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<AndroidNativeLibrary Include="lib\**\*.so" />
+	</ItemGroup>
 </Project>
