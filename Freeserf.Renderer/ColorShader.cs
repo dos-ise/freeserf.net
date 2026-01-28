@@ -1,7 +1,7 @@
 ﻿/*
  * ColorShader.cs - Basic color shader for colored shapes
  *
- * Copyright (C) 2018-2019  Robert Schneckenhaus <robert.schneckenhaus@web.de>
+ * Copyright (C) 2018-2019  Robert Schneckenhaus
  *
  * This file is part of freeserf.net. freeserf.net is based on freeserf.
  *
@@ -9,14 +9,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * freeserf.net is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with freeserf.net. If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace Freeserf.Renderer
@@ -41,9 +33,9 @@ namespace Freeserf.Renderer
         readonly string positionName;
         readonly string layerName;
 
-        // ---------------------------------------------------------------------
-        // Unified GLSL / GLES helpers
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
+        // GLSL / GLES helpers
+        // -------------------------------------------------------------
 
         private static bool IsGLES()
         {
@@ -53,7 +45,6 @@ namespace Freeserf.Renderer
 
         private static bool IsLegacyGL()
         {
-            // Desktop GLSL < 1.30
             return !IsGLES() && State.GLSLVersionMajor == 1 && State.GLSLVersionMinor < 3;
         }
 
@@ -61,7 +52,6 @@ namespace Freeserf.Renderer
         {
             if (IsGLES())
             {
-                // GLES 2.0 → GLSL ES 1.00
                 if (State.GLSLVersionMajor == 1 && State.GLSLVersionMinor == 0)
                 {
                     return "#version 100\n" +
@@ -69,13 +59,11 @@ namespace Freeserf.Renderer
                            "precision mediump int;\n\n";
                 }
 
-                // GLES 3.x → e.g. #version 300 es
                 return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} es\n" +
                        "precision mediump float;\n" +
                        "precision mediump int;\n\n";
             }
 
-            // Desktop GL: keep original style
             return $"#version {State.GLSLVersionMajor}{State.GLSLVersionMinor} {State.GLSLVersionSuffix}\n\n";
         }
 
@@ -119,7 +107,6 @@ namespace Freeserf.Renderer
 
         private static bool UsesLegacyFragColor()
         {
-            // Desktop GLSL < 1.30 or GLES 2.0 → gl_FragColor
             if (IsLegacyGL())
                 return true;
 
@@ -129,43 +116,26 @@ namespace Freeserf.Renderer
             return false;
         }
 
-        // ---------------------------------------------------------------------
-        // Compatibility layer for old API (names used in this file)
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Compatibility helpers
+        // -------------------------------------------------------------
 
-        protected static bool HasGLFragColor()
-        {
-            return UsesLegacyFragColor();
-        }
-
+        protected static bool HasGLFragColor() => UsesLegacyFragColor();
         protected static string GetFragmentShaderHeader()
         {
             string header = GLSLVersionHeader();
-
             if (!UsesLegacyFragColor())
                 header += $"out vec4 {DefaultFragmentOutColorName};\n";
-
             return header;
         }
 
-        protected static string GetVertexShaderHeader()
-        {
-            return GLSLVersionHeader();
-        }
+        protected static string GetVertexShaderHeader() => GLSLVersionHeader();
+        protected static string GetInName(bool fragment) => InQualifier(fragment);
+        protected static string GetOutName() => OutQualifier();
 
-        protected static string GetInName(bool fragment)
-        {
-            return InQualifier(fragment);
-        }
-
-        protected static string GetOutName()
-        {
-            return OutQualifier();
-        }
-
-        // ---------------------------------------------------------------------
-        // Unified shader generators (used via the arrays below)
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Shader generators
+        // -------------------------------------------------------------
 
         private static string GenerateVertexShader()
         {
@@ -180,17 +150,18 @@ namespace Freeserf.Renderer
 
             string varying = flat ? "flat " + OutQualifier() : OutQualifier();
 
-            string layerDecl = ints
-                ? $"    float layer = float({DefaultLayerName});"
-                : $"    float layer = {DefaultLayerName};";
-
             string posExpr = ints
                 ? $"    vec2 pos = vec2(float({DefaultPositionName}.x) + 0.49, float({DefaultPositionName}.y) + 0.49);"
                 : $"    vec2 pos = {DefaultPositionName} + vec2(0.49, 0.49);";
 
+            // FIXED: safe float conversion for uvec4
             string colorExpr = ints
-                ? $"    pixelColor = vec4({DefaultColorName}.r / 255.0, {DefaultColorName}.g / 255.0, {DefaultColorName}.b / 255.0, {DefaultColorName}.a / 255.0);"
+                ? $"    pixelColor = vec4({DefaultColorName}) / 255.0;"
                 : $"    pixelColor = {DefaultColorName} / 255.0;";
+
+            string layerExpr = ints
+                ? $"    float layer = float({DefaultLayerName});"
+                : $"    float layer = {DefaultLayerName};";
 
             return string.Join("\n", new[]
             {
@@ -207,7 +178,7 @@ namespace Freeserf.Renderer
                 "{",
                 posExpr,
                 colorExpr,
-                layerDecl,
+                layerExpr,
                 $"    gl_Position = {DefaultProjectionMatrixName} * {DefaultModelViewMatrixName} * vec4(pos, 1.0 - {DefaultZName} - layer * 0.00001, 1.0);",
                 "}"
             });
@@ -222,10 +193,7 @@ namespace Freeserf.Renderer
 
             string varying = flat ? "flat " + InQualifier(true) : InQualifier(true);
 
-            string outputDecl = legacyFragColor
-                ? ""
-                : $"out vec4 {DefaultFragmentOutColorName};\n";
-
+            string outputDecl = legacyFragColor ? "" : $"out vec4 {DefaultFragmentOutColorName};\n";
             string outputAssign = legacyFragColor
                 ? "gl_FragColor = pixelColor;"
                 : $"{DefaultFragmentOutColorName} = pixelColor;";
@@ -243,23 +211,16 @@ namespace Freeserf.Renderer
             });
         }
 
-        // ---------------------------------------------------------------------
-        // Static shader arrays (kept for constructor compatibility)
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Static shader arrays
+        // -------------------------------------------------------------
 
-        static readonly string[] ColorFragmentShader = new string[]
-        {
-            GenerateFragmentShader()
-        };
+        static readonly string[] ColorFragmentShader = { GenerateFragmentShader() };
+        static readonly string[] ColorVertexShader = { GenerateVertexShader() };
 
-        static readonly string[] ColorVertexShader = new string[]
-        {
-            GenerateVertexShader()
-        };
-
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
         // Public API
-        // ---------------------------------------------------------------------
+        // -------------------------------------------------------------
 
         public void UpdateMatrices(bool zoom)
         {
@@ -301,8 +262,6 @@ namespace Freeserf.Renderer
             var vertexShader = new Shader(Shader.Type.Vertex, string.Join("\n", vertexShaderLines));
 
             shaderProgram = new ShaderProgram(fragmentShader, vertexShader);
-
-            // Option A: always call this; for legacy/GLES2 use "gl_FragColor"
             shaderProgram.SetFragmentColorOutputName(fragmentOutColorName);
         }
 
