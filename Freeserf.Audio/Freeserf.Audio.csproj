@@ -80,7 +80,7 @@
   <ItemGroup>
     <PackageReference Include="ManagedBass" Version="4.0.2" />
     <PackageReference Include="ManagedBass.Midi" Version="4.0.2" />
-    <PackageReference Include="Silk.NET.Input.Glfw" Version="2.22.0" />
+    <PackageReference Include="Silk.NET.Input.Glfw" Version="2.23.0" />
   </ItemGroup>
 
   <ItemGroup>

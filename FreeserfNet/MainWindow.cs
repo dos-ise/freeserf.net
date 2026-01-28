@@ -249,7 +249,7 @@ namespace Freeserf
 
             using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(stream);
 
-            // Pixel in ein flaches Byte-Array kopieren
+            // Copy pixels into a flat array
             var data = new byte[image.Width * image.Height * 4];
             image.CopyPixelDataTo(data);
 
