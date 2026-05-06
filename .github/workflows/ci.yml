@@ -53,9 +53,6 @@ jobs:
         run: |
           mkdir Freeserf_binaries/Resources
           mv freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/Bass/ Freeserf_binaries
-          # mv freeserf/FreeserfNet/icon_mac.png Freeserf_binaries/Resources/
-          # mv freeserf/FreeserfNet/Info.plist Freeserf_binaries/Resources/
-          # mv freeserf/FreeserfNet/bass/osx/libbass.dylib Freeserf_binaries
 
       - name: Create Archive
         run: |
