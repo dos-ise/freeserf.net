@@ -47,6 +47,7 @@ jobs:
           dotnet publish -c MacRelease freeserf/FreeserfNet/FreeserfNet.csproj -p:DefineConstants=OSX -p:PublishSingleFile=true -r osx-x64
           lipo -create -arch arm64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/FreeserfNet -arch x86_64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-x64/publish/FreeserfNet -output Freeserf_binaries/FreeserfNet
           lipo -create -arch arm64 freeserf//FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/libglfw.3.dylib -arch x86_64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-x64/publish/libglfw.3.dylib -output Freeserf_binaries/libglfw.3.dylib
+          codesign --force --deep --sign - Freeserf_binaries/FreeserfNet
 
       - name: Add Required Files
         run: |
