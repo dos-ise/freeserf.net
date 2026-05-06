@@ -1,0 +1,128 @@
+name: macOS
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**"
+      - "!.github/**"
+      - ".github/workflows/ci.yml"
+      - "!**.md"
+
+  pull_request:
+    paths:
+      - "**"
+      - "!.github/**"
+      - ".github/workflows/ci.yml"
+      - "!**.md"
+
+jobs:
+  Binaries:
+    strategy:
+      fail-fast: false
+
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout Freeserf.net
+        uses: actions/checkout@v6
+        with:
+          repository: Pyrdacor/freeserf.net
+          submodules: recursive
+          path: freeserf
+
+      - name: Install Dependencies
+        run: |
+          echo "Installing dependencies"
+          brew install dotnet
+
+      - name: Set Build Flags
+        run: |
+          echo "PLATFORM=macOS" >> $GITHUB_ENV
+
+      - name: Build Freeserf
+        run: |
+          mkdir Freeserf_binaries
+          dotnet publish -c MacRelease freeserf/FreeserfNet/FreeserfNet.csproj -p:DefineConstants=OSX -p:PublishSingleFile=true -r osx-arm64
+          dotnet publish -c MacRelease freeserf/FreeserfNet/FreeserfNet.csproj -p:DefineConstants=OSX -p:PublishSingleFile=true -r osx-x64
+          lipo -create -arch arm64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/FreeserfNet -arch x86_64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-x64/publish/FreeserfNet -output Freeserf_binaries/FreeserfNet
+          lipo -create -arch arm64 freeserf//FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/libglfw.3.dylib -arch x86_64 freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-x64/publish/libglfw.3.dylib -output Freeserf_binaries/libglfw.3.dylib
+
+      - name: Add Required Files
+        run: |
+          mkdir Freeserf_binaries/Resources
+          mv freeserf/FreeserfNet/bin/${{ env.PLATFORM }}/MacRelease/osx-arm64/publish/Bass/ Freeserf_binaries
+          # mv freeserf/FreeserfNet/icon_mac.png Freeserf_binaries/Resources/
+          # mv freeserf/FreeserfNet/Info.plist Freeserf_binaries/Resources/
+          # mv freeserf/FreeserfNet/bass/osx/libbass.dylib Freeserf_binaries
+
+      - name: Create Archive
+        run: |
+          tar cv Freeserf_binaries | gzip -9 > Freeserf.tar.gz
+
+      - name: Upload Artifacts - ${{ env.PLATFORM }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: Freeserf-${{ env.PLATFORM }}-Bin
+          path: Freeserf.tar.gz
+          if-no-files-found: error
+
+  Bundle:
+    strategy:
+      fail-fast: false
+
+    runs-on: macos-26
+    needs: Binaries
+
+    steps:
+      - name: Download Binaries
+        uses: actions/download-artifact@v7
+        with:
+          name: Freeserf-macOS-Bin
+          path: freeserf
+
+      - name: Checkout Freeserf.net
+        uses: actions/checkout@v6
+        with:
+          repository: Pyrdacor/freeserf.net
+          submodules: recursive
+          path: freeserf
+
+      - name: Make App Bundle
+        run: |
+          tar -xvf Freeserf/Freeserf.tar.gz
+          mkdir -p Freeserf.app/Contents/MacOS/Bass
+          mkdir -p Freeserf.app/Contents/Frameworks
+          mkdir -p Freeserf.app/Contents/Resources
+          cp Freeserf_binaries/FreeserfNet Freeserf.app/Contents/MacOS/FreeserfNet
+          cp Freeserf_binaries/Bass/ChoriumRevA.SF2 Freeserf.app/Contents/MacOS/Bass/
+          cp Freeserf_binaries/libglfw.3.dylib Freeserf.app/Contents/Frameworks/libglfw.3.dylib
+          cp freeserf/FreeserfNet/bass/osx/libbass.dylib Freeserf.app/Contents/Frameworks/libbass.dylib
+          cp freeserf/FreeserfNet/bass/osx/libbassmidi.dylib Freeserf.app/Contents/Frameworks/libbassmidi.dylib
+          mkdir Freeserf.iconset
+          sips -z 16 16     freeserf/FreeserfNet/icon_mac.png --out Freeserf.iconset/icon_16x16.png
+          sips -z 32 32     freeserf/FreeserfNet/icon_mac.png --out Freeserf.iconset/icon_16x16@2x.png
+          sips -z 128 128   freeserf/FreeserfNet/icon_mac.png --out Freeserf.iconset/icon_128x128.png
+          sips -z 256 256   freeserf/FreeserfNet/icon_mac.png --out Freeserf.iconset/icon_128x128@2x.png
+          sips -z 512 512   freeserf/FreeserfNet/icon_mac.png --out Freeserf.iconset/icon_512x512.png
+          cp freeserf/FreeserfNet/icon_mac.png Freeserf.iconset/icon_512x512@2x.png
+          iconutil -c icns Freeserf.iconset
+          cp -R Freeserf.icns Freeserf.app/Contents/Resources/
+          cp freeserf/FreeserfNet/Info.plist Freeserf.app/Contents/Info.plist
+          echo "-n APPLFRSF" > "Freeserf.app/Contents/PkgInfo"
+          install_name_tool -add_rpath @executable_path/../Frameworks Freeserf.app/Contents/MacOS/FreeserfNet
+          dylibbundler --fix-file Freeserf.app/Contents/MacOS/FreeserfNet -p @executable_path/../Frameworks/
+
+      - name: Create Archive
+        run: |
+          mkdir image
+          ln -s /Applications image/Applications
+          mv Freeserf.app image/Freeserf.app
+          hdiutil create -volname "Freeserf" -srcfolder image Freeserf
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: Freeserf-macOS-App
+          path: Freeserf.dmg
+          if-no-files-found: error
