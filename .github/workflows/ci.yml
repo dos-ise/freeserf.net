@@ -69,12 +69,6 @@ jobs:
     needs: Binaries
 
     steps:
-      - name: Download Binaries
-        uses: actions/download-artifact@v7
-        with:
-          name: Freeserf-macOS-Bin
-          path: freeserf_bin
-
       - name: Checkout Freeserf.net
         uses: actions/checkout@v6
         with:
@@ -82,12 +76,19 @@ jobs:
           submodules: recursive
           path: freeserf
 
-      - name: Install Dependencies
+      - name: Download Binaries
+        uses: actions/download-artifact@v7
+        with:
+          name: Freeserf-macOS-Bin
+          path: freeserf_bin
+          
+       - name: Install Dependencies
         run: |
           echo "Installing dependencies"
           brew install dylibbundler
 
       - name: Make App Bundle
+        working-directory: ${{ github.workspace }}
         run: |
           tar -xvf freeserf_bin/Freeserf.tar.gz
           mkdir -p Freeserf.app/Contents/MacOS/Bass
@@ -113,6 +114,7 @@ jobs:
           dylibbundler --fix-file Freeserf.app/Contents/MacOS/FreeserfNet -p @executable_path/../Frameworks/
 
       - name: Create Archive
+        working-directory: ${{ github.workspace }}
         run: |
           mkdir image
           ln -s /Applications image/Applications

@@ -151,7 +151,7 @@ namespace Freeserf.Data
             DataSourceMixed.DataUsage soundDataUsage = DataSourceMixed.DataUsage.PreferDos,
             DataSourceMixed.DataUsage musicDataUsage = DataSourceMixed.DataUsage.PreferAmiga)
         {
-            List<string> searchPaths = new List<string>();
+            List<string> searchPaths = [];
 
             if (!string.IsNullOrWhiteSpace(path))
             {
@@ -255,6 +255,8 @@ namespace Freeserf.Data
                 paths.Add("/usr/local/share/freeserf");
                 paths.Add("/usr/share/freeserf");
             }
+
+            paths.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "freeserf"));
 
             return paths;
         }
