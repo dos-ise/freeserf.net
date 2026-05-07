@@ -73,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: Freeserf-macOS-Bin
-          path: freeserf
+          path: freeserf_bin
 
       - name: Checkout Freeserf.net
         uses: actions/checkout@v6
@@ -82,9 +82,14 @@ jobs:
           submodules: recursive
           path: freeserf
 
+      - name: Install Dependencies
+        run: |
+          echo "Installing dependencies"
+          brew install dylibbundler
+
       - name: Make App Bundle
         run: |
-          tar -xvf freeserf/Freeserf.tar.gz
+          tar -xvf freeserf_bin/Freeserf.tar.gz
           mkdir -p Freeserf.app/Contents/MacOS/Bass
           mkdir -p Freeserf.app/Contents/Frameworks
           mkdir -p Freeserf.app/Contents/Resources
