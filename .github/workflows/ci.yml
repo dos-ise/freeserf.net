@@ -84,7 +84,8 @@ jobs:
 
       - name: Make App Bundle
         run: |
-          tar -xvf Freeserf/Freeserf.tar.gz
+          ls -lh
+          tar -xvf freeserf/Freeserf.tar.gz
           mkdir -p Freeserf.app/Contents/MacOS/Bass
           mkdir -p Freeserf.app/Contents/Frameworks
           mkdir -p Freeserf.app/Contents/Resources
