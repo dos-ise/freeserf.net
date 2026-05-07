@@ -82,11 +82,11 @@ jobs:
           name: Freeserf-macOS-Bin
           path: freeserf_bin
           
-       - name: Install Dependencies
+      - name: Install Dependencies
         run: |
           echo "Installing dependencies"
           brew install dylibbundler
-
+          
       - name: Make App Bundle
         working-directory: ${{ github.workspace }}
         run: |
