@@ -269,3 +269,6 @@ gfxheader
 gfxpics
 music
 sounds
+
+# macOS resource files
+.DS_Store
