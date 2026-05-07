@@ -1,3 +1,29 @@
+Version 2.2.4:
+==============
+
+- Added app data path to search paths (e.g. `~/Library/Application Support/freeserf` on macOS)
+
+Thanks to shinra-electric for:
+- Adding github CI for macOS builds
+- Adding icon and other assets for macOS builds
+
+
+Version 2.2.3:
+==============
+
+Thanks to Christopherianos for:
+- Updated bass midi to fix "undefined symbol" error
+
+Thanks to dos-ise for:
+- Upgraded to .NET 9
+- Added app icon
+- Switched to ManagedBass
+- Fixed windows taskbar visible in fullscreen
+- Added considerating the Ubisoft History Edition path for game data detection
+- Fixed OpenGL version detection on some Linux distros
+- Added support for game controllers/pads
+
+
 Version 2.2.2:
 ==============
 
