@@ -11,11 +11,11 @@ Freeserf.net is a C# port and extension of [freeserf](https://github.com/freeser
 
 ## Download the game
 
-| Windows | Linux |
-| ---- | ---- |
-| [v2.2.3](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.3/Freeserf.net-Windows.zip "Windows v2.2.3") | [v2.2.3](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.3/Freeserf.net-Linux.tar.gz "Linux v2.2.3") |
+| Windows | Linux | macOS Bundle | macOS Binary |
+| ---- | ---- | ---- | ---- |
+| [v2.2.4](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.4/Freeserf.net-Windows.zip "Windows v2.2.4") | [v2.2.4](https://github.com/Pyrdacor/freeserf.net/releases/download/v2.2.4/Freeserf.net-Linux.tar.gz "Linux v2.2.4") | [v2.2.4](https://github.com/Pyrdacor/freeserf.net/actions/runs/25501990274/artifacts/6857835406 "macOS v2.2.4 Bundle") | [v2.2.4](https://github.com/Pyrdacor/freeserf.net/actions/runs/25501990274/artifacts/6857808030 "macOS v2.2.4 Binary") |
 
-Latest version 2.2.3 was released on 28th of January 2026.
+Latest version 2.2.4 was released on 7th of May 2026.
 
 Builds for other platforms will follow later. Only recent Ubuntu versions are tested for Linux version.
 
@@ -112,6 +112,7 @@ Thanks to the following devs for their contributions:
 - Christopherianos
 - noxdk
 - athach
+- shinra-electric (https://github.com/shinra-electric)
 
 
 ## Ingame key shortcuts

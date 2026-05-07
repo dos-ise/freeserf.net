@@ -3,18 +3,8 @@ name: macOS
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "**"
-      - "!.github/**"
-      - ".github/workflows/ci.yml"
-      - "!**.md"
-
-  pull_request:
-    paths:
-      - "**"
-      - "!.github/**"
-      - ".github/workflows/ci.yml"
-      - "!**.md"
+    tags:
+      - 'v*.*.*'
 
 jobs:
   Binaries:
