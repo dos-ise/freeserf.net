@@ -513,10 +513,10 @@ namespace Freeserf.UI
             AddChild(serverAddressInput, 8 * 20 + 16, 18 + 16, false);
 
             serverNameInput = new TextInput(interf, 9, Render.TextRenderType.Legacy);
-            serverNameInput.SetSize(15 * 9 + 8, 8);
-            serverNameInput.MaxLength = 15;
-            serverNameInput.Text = "Freeserf Server";
-            AddChild(serverNameInput, 8 * 20 + 16, 18 + 16, false);
+            serverNameInput.SetSize(13 * 9 + 8, 8);
+            serverNameInput.MaxLength = 13;
+            serverNameInput.Text = "Freeserf";
+            AddChild(serverNameInput, 140, 26, false);
 
             textFieldServerIp = new TextField(interf, 1, 9);
             AddChild(textFieldServerIp, 0, 0, false);
@@ -784,19 +784,28 @@ namespace Freeserf.UI
 
                         if (gameType == GameType.MultiplayerServer)
                         {
-                            DrawBoxString(10, 18, textFieldName, "Name:");
+                            // The map seed is fixed when the server is created, so
+                            // the random input is not needed in the lobby. Hide it
+                            // and move the map size button into its place to make
+                            // room for the server name and host IP.
+                            randomInput.Displayed = false;
+                            buttonMapSize.MoveTo(256, 12);
+
+                            DrawBoxString(10, 10, textFieldName, "Name:");
                             serverNameInput.Displayed = Displayed;
-                            serverNameInput.MoveTo(8 * 20 + 16, 18 + 16);
+                            serverNameInput.MoveTo(140, 26);
                             HideBoxString(textFieldValue);
 
                             // Show the host IP so clients know what to enter to join.
                             if (Server != null && Server.Ip != null)
-                                DrawBoxString(26, 2, textFieldServerIp, "IP: " + Server.Ip);
+                                DrawBoxString(10, 18, textFieldServerIp, "IP: " + Server.Ip);
                             else
                                 HideBoxString(textFieldServerIp);
                         }
                         else
                         {
+                            buttonMapSize.MoveTo(212, 16);
+
                             DrawBoxString(10, 18, textFieldName, "Mapsize:");
                             DrawBoxString(20, 18, textFieldValue, ServerGameInfo.MapSize.ToString());
                             serverNameInput.Displayed = false;
