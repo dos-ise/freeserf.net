@@ -31,7 +31,7 @@
   <ItemGroup>
     <!-- The app uses the DLR (dynamic) in Freeserf.Core (Buffer.cs, Savegame.cs),
          so keep Microsoft.CSharp.dll (RuntimeBinder) when trimming. -->
-    <TrimmerRootAssembly Include="Microsoft.CSharp" />
+    <TrimmerRootAssembly Include="Microsoft.CSharp" RootMode="All" />
   </ItemGroup>
 
   <ItemGroup>
