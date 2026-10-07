@@ -921,3 +921,18 @@ SDL: SDLActivity thread ends (error=Try to release egl_surface with context prob
 - `MainActivity.OnStop` calls `GameView.DisconnectNetwork()` (new, delegates to `Gui`) so
   connections are closed when the app is backgrounded.
 - LAN play works; internet play (NAT/port forwarding) is out of scope.
+
+### Device test results (Samsung Galaxy A13, 2026-10-07)
+
+- APK installed and launched; no crash. Server creation works: `LocalServer` binds to the
+  WiFi IP (192.168.178.151:5067) and answers a `LobbyData` request with valid lobby data
+  (verified with `nc` from the device itself).
+- **Touch-mode layout overlap (FIXED):** in touch mode the GUI scale is 4.255 (not 1.84),
+  so the first version of the server name input and host IP text overlapped the map seed
+  input and the map size button. Fix: for the MultiplayerServer screen the map seed input
+  is hidden (it is fixed at server creation), the map size button is moved into its place,
+  and the server name input + host IP are shown in the freed rows above the player boxes.
+- **PC <-> Android over LAN:** the code works, but the test network blocked PC<->device
+  traffic (AP client isolation: the device reached the gateway, the PC did not). This is a
+  router configuration issue, not a code issue. For LAN play, both devices must be on the
+  same network without client isolation (or the PC on the same WiFi as the phone).
