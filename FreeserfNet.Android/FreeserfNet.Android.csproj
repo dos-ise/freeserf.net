@@ -3,8 +3,8 @@
   <!-- Local signing configuration (keystore path, alias, passwords) for the
        Play Store release build. This file is gitignored; copy
        signing.local.props.example to signing.local.props and fill in your
-       values. Without it the package is signed with the debug keystore and
-       Google Play rejects it. -->
+       values. It must set AndroidKeyStore=True, otherwise the SDK signs with
+       the debug keystore and Google Play rejects the package. -->
   <Import Project="signing.local.props" Condition="Exists('signing.local.props')" />
 
   <PropertyGroup>

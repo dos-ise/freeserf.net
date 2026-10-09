@@ -89,7 +89,9 @@ keystore:
 2. **Create `FreeserfNet.Android\signing.local.props`** by copying
    `signing.local.props.example` and filling in keystore path, alias and
    passwords. The file is gitignored, so the passwords never enter the repo.
-   The csproj imports it automatically when present.
+   The csproj imports it automatically when present. It must set
+   `AndroidKeyStore=True` — without it the SDK always signs with the debug
+   keystore.
 
 3. **Build the release AAB** (Android App Bundle, required by Google Play for
    new apps):
