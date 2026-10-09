@@ -272,3 +272,8 @@ sounds
 
 # macOS resource files
 .DS_Store
+
+# Android signing (local, never commit keystores or passwords)
+signing.local.props
+*.jks
+*.keystore

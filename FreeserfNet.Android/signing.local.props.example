@@ -1,0 +1,25 @@
+<Project>
+  <!--
+    Local Android signing configuration for the Play Store release build.
+
+    Copy this file to signing.local.props (next to this file) and fill in
+    your keystore values. signing.local.props is gitignored, so the
+    passwords never end up in the repository.
+
+    Find the alias of an existing key in your keystore with:
+      keytool -list -keystore "path\to\keystore.jks" -storepass <storepass>
+
+    Or create a new key in an existing keystore with:
+      keytool -genkeypair -v -keystore "path\to\keystore.jks" \
+        -alias freeserf -keyalg RSA -keysize 2048 -validity 10000
+
+    Build the release AAB with:
+      .\build-android.ps1 -PackageFormat aab
+  -->
+  <PropertyGroup>
+    <AndroidSigningKeyStore>D:\path\to\your-keystore.jks</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>your-alias</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>your-key-password</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>your-keystore-password</AndroidSigningStorePass>
+  </PropertyGroup>
+</Project>
