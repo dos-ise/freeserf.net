@@ -201,8 +201,8 @@ decode to PCM in managed code and stream via `Android.Media.AudioTrack`.
    ```powershell
    adb install -r <apk>
    adb logcat -c
-   adb shell am force-stop net.freeserf.android
-   adb shell am start -n net.freeserf.android/crc64bcc776d209640335.MainActivity
+   adb shell am force-stop com.dossoft.freeserf
+   adb shell am start -n com.dossoft.freeserf/crc64bcc776d209640335.MainActivity
    ```
 4. **logcat checks** (wait ~25-30 s after launch):
    - The old warning `Shared library 'bass' not loaded` must be **gone**.

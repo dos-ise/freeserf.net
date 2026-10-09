@@ -7,7 +7,7 @@ on this codebase so they don't have to rediscover these issues.
 ## Overview
 
 - The Android host project is `FreeserfNet.Android/` (targets `net10.0-android`,
-  minSdk 21, targetSdk 36, package `net.freeserf.android`).
+  minSdk 24, targetSdk 36, package `com.dossoft.freeserf`).
 - It uses **Silk.NET 2.23.0** (`Silk.NET.Windowing.Sdl`, `Silk.NET.Input.Sdl`,
   `Silk.NET.OpenGL`). The activity extends `SilkActivity` from
   `Silk.NET.Windowing.Sdl.Android`, which itself extends SDL's `SDLActivity`.
@@ -66,7 +66,7 @@ To include an external `SPAE.PA` (bundled into the APK), add
 it, the APK ships without game data and the user imports it via the file
 picker on first start.
 
-Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.apk`
+Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.apk`
 (~101 MB with trimming/AOT disabled and data bundled; ~30 MB when trimmed;
 ~4 MB without bundled data). For the Play Store, build an AAB instead (see
 below).
@@ -100,7 +100,7 @@ keystore:
    .\build-android.ps1 -PackageFormat aab
    ```
 
-   Output: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.aab`
+   Output: `FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.aab`
 
    For a one-off build (e.g. CI) you can pass the signing values directly
    instead of the props file:
@@ -358,13 +358,13 @@ Notes:
   **user PATH** (2026-10-05) so `adb` works in newly opened terminals. Existing shells
   still need the full path or a PATH refresh (`$env:Path += ";C:\Program Files (x86)\Android\android-sdk\platform-tools"`).
 - Device: `3C211JEKB03986` (Pixel 8a / akita). MainActivity:
-  `net.freeserf.android/crc64bcc776d209640335.MainActivity`.
+  `com.dossoft.freeserf/crc64bcc776d209640335.MainActivity`.
 - Install / launch / log:
   ```powershell
   adb install -r <apk>
   adb logcat -c
-  adb shell am force-stop net.freeserf.android
-  adb shell am start -n net.freeserf.android/crc64bcc776d209640335.MainActivity
+  adb shell am force-stop com.dossoft.freeserf
+  adb shell am start -n com.dossoft.freeserf/crc64bcc776d209640335.MainActivity
   adb logcat -d --pid=<pid>          # or: adb logcat -d -s Freeserf_Info:* Freeserf_Error:*
   ```
 - `run-as` does NOT work (Release build, `Debuggable=false`).
