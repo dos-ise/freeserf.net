@@ -105,7 +105,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-$pkg = Join-Path $PSScriptRoot "FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.$PackageFormat"
+$pkg = Join-Path $PSScriptRoot "FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.$PackageFormat"
 if (Test-Path $pkg) {
     Write-Host "$($PackageFormat.ToUpper()): $pkg" -ForegroundColor Green
     if ($PackageFormat -eq "apk") {

@@ -12,7 +12,7 @@
     <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationId>net.freeserf.android</ApplicationId>
+    <ApplicationId>com.dossoft.freeserf</ApplicationId>
     <ApplicationTitle>Freeserf</ApplicationTitle>
     <RootNamespace>Freeserf.Android</RootNamespace>
     <AssemblyName>FreeserfNet.Android</AssemblyName>
