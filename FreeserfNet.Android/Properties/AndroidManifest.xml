@@ -3,7 +3,7 @@
           android:versionCode="1"
           android:versionName="1.0"
           package="net.freeserf.android">
-  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="36" />
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
