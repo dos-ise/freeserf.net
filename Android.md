@@ -68,7 +68,52 @@ picker on first start.
 
 Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.apk`
 (~101 MB with trimming/AOT disabled and data bundled; ~30 MB when trimmed;
-~4 MB without bundled data).
+~4 MB without bundled data). For the Play Store, build an AAB instead (see
+below).
+
+### Signing for Google Play (release signing)
+
+Without signing configuration the package is signed with the **debug keystore**
+and Google Play rejects it with *"signed in debug mode"*. To sign with your own
+keystore:
+
+1. **Find the alias** of an existing key in your keystore (or create a new key
+   in the same keystore — a keystore can hold multiple keys):
+
+   ```powershell
+   keytool -list -keystore "D:\path\to\keystore.jks" -storepass <storepass>
+   keytool -genkeypair -v -keystore "D:\path\to\keystore.jks" `
+     -alias freeserf -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+2. **Create `FreeserfNet.Android\signing.local.props`** by copying
+   `signing.local.props.example` and filling in keystore path, alias and
+   passwords. The file is gitignored, so the passwords never enter the repo.
+   The csproj imports it automatically when present.
+
+3. **Build the release AAB** (Android App Bundle, required by Google Play for
+   new apps):
+
+   ```powershell
+   .\build-android.ps1 -PackageFormat aab
+   ```
+
+   Output: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.aab`
+
+   For a one-off build (e.g. CI) you can pass the signing values directly
+   instead of the props file:
+
+   ```powershell
+   .\build-android.ps1 -PackageFormat aab `
+     -KeyStore "D:\path\to\keystore.jks" -KeyAlias freeserf `
+     -KeyPass <keypass> -StorePass <storepass>
+   ```
+
+   `-PackageFormat apk` (the default) keeps producing the APK as before.
+
+**Important:** the signing key must stay the same for every update of the app
+on Google Play. If you use *Play App Signing*, Google holds the app signing key
+and the upload key above only needs to be consistent for uploads.
 
 ### Why trimming and AOT are disabled (MSB4018)
 
