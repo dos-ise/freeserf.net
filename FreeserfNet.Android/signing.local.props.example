@@ -17,6 +17,7 @@
       .\build-android.ps1 -PackageFormat aab
   -->
   <PropertyGroup>
+    <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>D:\path\to\your-keystore.jks</AndroidSigningKeyStore>
     <AndroidSigningKeyAlias>your-alias</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>your-key-password</AndroidSigningKeyPass>

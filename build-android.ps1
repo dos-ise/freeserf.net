@@ -93,6 +93,10 @@ if ($KeyStore) { $args += "-p:AndroidSigningKeyStore=$KeyStore" }
 if ($KeyAlias) { $args += "-p:AndroidSigningKeyAlias=$KeyAlias" }
 if ($KeyPass) { $args += "-p:AndroidSigningKeyPass=$KeyPass" }
 if ($StorePass) { $args += "-p:AndroidSigningStorePass=$StorePass" }
+if ($KeyStore -or $KeyAlias -or $KeyPass -or $StorePass) {
+    # Without AndroidKeyStore=True the SDK always signs with the debug keystore.
+    $args += "-p:AndroidKeyStore=True"
+}
 
 Write-Host "Building Android $PackageFormat..." -ForegroundColor Cyan
 & dotnet @args
