@@ -7,7 +7,7 @@ on this codebase so they don't have to rediscover these issues.
 ## Overview
 
 - The Android host project is `FreeserfNet.Android/` (targets `net10.0-android`,
-  minSdk 21, targetSdk 36, package `net.freeserf.android`).
+  minSdk 24, targetSdk 36, package `com.dossoft.freeserf`).
 - It uses **Silk.NET 2.23.0** (`Silk.NET.Windowing.Sdl`, `Silk.NET.Input.Sdl`,
   `Silk.NET.OpenGL`). The activity extends `SilkActivity` from
   `Silk.NET.Windowing.Sdl.Android`, which itself extends SDL's `SDLActivity`.
@@ -66,9 +66,56 @@ To include an external `SPAE.PA` (bundled into the APK), add
 it, the APK ships without game data and the user imports it via the file
 picker on first start.
 
-Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.apk`
+Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.apk`
 (~101 MB with trimming/AOT disabled and data bundled; ~30 MB when trimmed;
-~4 MB without bundled data).
+~4 MB without bundled data). For the Play Store, build an AAB instead (see
+below).
+
+### Signing for Google Play (release signing)
+
+Without signing configuration the package is signed with the **debug keystore**
+and Google Play rejects it with *"signed in debug mode"*. To sign with your own
+keystore:
+
+1. **Find the alias** of an existing key in your keystore (or create a new key
+   in the same keystore — a keystore can hold multiple keys):
+
+   ```powershell
+   keytool -list -keystore "D:\path\to\keystore.jks" -storepass <storepass>
+   keytool -genkeypair -v -keystore "D:\path\to\keystore.jks" `
+     -alias freeserf -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+2. **Create `FreeserfNet.Android\signing.local.props`** by copying
+   `signing.local.props.example` and filling in keystore path, alias and
+   passwords. The file is gitignored, so the passwords never enter the repo.
+   The csproj imports it automatically when present. It must set
+   `AndroidKeyStore=True` — without it the SDK always signs with the debug
+   keystore.
+
+3. **Build the release AAB** (Android App Bundle, required by Google Play for
+   new apps):
+
+   ```powershell
+   .\build-android.ps1 -PackageFormat aab
+   ```
+
+   Output: `FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.aab`
+
+   For a one-off build (e.g. CI) you can pass the signing values directly
+   instead of the props file:
+
+   ```powershell
+   .\build-android.ps1 -PackageFormat aab `
+     -KeyStore "D:\path\to\keystore.jks" -KeyAlias freeserf `
+     -KeyPass <keypass> -StorePass <storepass>
+   ```
+
+   `-PackageFormat apk` (the default) keeps producing the APK as before.
+
+**Important:** the signing key must stay the same for every update of the app
+on Google Play. If you use *Play App Signing*, Google holds the app signing key
+and the upload key above only needs to be consistent for uploads.
 
 ### Why trimming and AOT are disabled (MSB4018)
 
@@ -311,13 +358,13 @@ Notes:
   **user PATH** (2026-10-05) so `adb` works in newly opened terminals. Existing shells
   still need the full path or a PATH refresh (`$env:Path += ";C:\Program Files (x86)\Android\android-sdk\platform-tools"`).
 - Device: `3C211JEKB03986` (Pixel 8a / akita). MainActivity:
-  `net.freeserf.android/crc64bcc776d209640335.MainActivity`.
+  `com.dossoft.freeserf/crc64bcc776d209640335.MainActivity`.
 - Install / launch / log:
   ```powershell
   adb install -r <apk>
   adb logcat -c
-  adb shell am force-stop net.freeserf.android
-  adb shell am start -n net.freeserf.android/crc64bcc776d209640335.MainActivity
+  adb shell am force-stop com.dossoft.freeserf
+  adb shell am start -n com.dossoft.freeserf/crc64bcc776d209640335.MainActivity
   adb logcat -d --pid=<pid>          # or: adb logcat -d -s Freeserf_Info:* Freeserf_Error:*
   ```
 - `run-as` does NOT work (Release build, `Debuggable=false`).
