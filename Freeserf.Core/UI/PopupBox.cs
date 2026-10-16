@@ -102,7 +102,8 @@ namespace Freeserf.UI
             JsCalibUpLeft,
             JsCalibDownRight,
             JsCalibCenter,
-            CtrlsInfo
+            CtrlsInfo,
+            TutorialOrders
         }
 
         public enum BackgroundPattern
@@ -859,6 +860,9 @@ namespace Freeserf.UI
 
             Box = box;
 
+            MiniMap.ShowsMap = box == Type.Map;
+            // The charts start one pixel lower than the map so that they end at the x axis (#152).
+            MiniMap.MoveTo(8, box == Type.Map ? 8 : 9);
             MiniMap.Displayed = box == Type.Map || box == Type.ResourceStatistics || box == Type.PlayerStatistics;
             fileList.Displayed = box == Type.LoadSave;
             fileField.Displayed = box == Type.LoadSave;
@@ -1806,7 +1810,8 @@ namespace Freeserf.UI
 
             for (int i = 0; i < 112; ++i)
             {
-                SetResourceChartValue(chartData, i, Math.Min((historicalData[i] * multiplier) >> 16, 64));
+                // the newest value is on the right like in the original game (#138)
+                SetResourceChartValue(chartData, 111 - i, Math.Min((historicalData[i] * multiplier) >> 16, 64));
             }
 
             // we use the minimap for displaying the chart as we can set pixel colors inside the minimap sprite freely
@@ -3560,6 +3565,55 @@ namespace Freeserf.UI
             }
         }
 
+        /* The task of the tutorial, shown when it starts. The original
+           only gives it in the manual; these are the goals the game
+           checks. */
+        void DrawTutorialOrdersBox()
+        {
+            /* The font has no comma. */
+            string[] orders = {
+                "Build a guard hut and a guard tower and a fortress.",
+                "Produce five planks and five stones.",
+                "Produce five fish and five meat and five bread.",
+                "Smelt five steel bars and five gold bars.",
+                "Make ten weapons and ten tools.",
+                "Conquer all the land of the enemy."
+            };
+
+            var game = interf.Game;
+            int level = game.TutorialLevel;
+
+            if (level < 1 || level > 6)
+            {
+                return;
+            }
+
+            SetText(8, 15, "   TUTORIAL " + level.ToString());
+            SetText(8, 35, "    ORDERS:");
+
+            /* Word wrap to the 16 characters of a line. */
+            var words = orders[level - 1].Split(' ');
+            string line = "";
+            int y = 55;
+
+            foreach (var word in words)
+            {
+                if (!string.IsNullOrEmpty(line) && line.Length + 1 + word.Length > 16)
+                {
+                    SetText(8, y, line);
+                    y += 10;
+                    line = "";
+                }
+
+                line += (line.Length == 0 ? "" : " ") + word;
+            }
+
+            if (!string.IsNullOrEmpty(line))
+            {
+                SetText(8, y, line);
+            }
+        }
+
         void DrawDemolishBox()
         {
             SetButton(120, 137, 60u, Action.CloseBox); // exit button
@@ -4894,6 +4948,9 @@ namespace Freeserf.UI
                 case Type.GameEnd:
                     DrawGameEndBox();
                     break;
+                case Type.TutorialOrders:
+                    DrawTutorialOrdersBox();
+                    break;
                 case Type.Demolish:
                     DrawDemolishBox();
                     break;
@@ -4997,6 +5054,11 @@ namespace Freeserf.UI
             interf.OpenPopup(Type.QuitConfirm);
         }
 
+        void HandleTutorialOrdersClick(int x, int y)
+        {
+            interf.ClosePopup();
+        }
+
         protected override bool HandleClickLeft(int x, int y, bool delayed)
         {
             if (delayed)
@@ -5012,6 +5074,13 @@ namespace Freeserf.UI
             if (Box == Type.GameEnd)
             {
                 HandleGameEndClick(x, y);
+
+                return true;
+            }
+
+            if (Box == Type.TutorialOrders)
+            {
+                HandleTutorialOrdersClick(x, y);
 
                 return true;
             }

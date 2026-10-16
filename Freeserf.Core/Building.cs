@@ -257,6 +257,19 @@ namespace Freeserf
             return state.FirstKnight != 0;
         }
 
+        /* Set up as occupied, then put knights in without the first
+           knight's arrival (tutorial 6's enemy). */
+        public void SetOccupied()
+        {
+            state.Active = true;
+        }
+
+        public void PlaceKnight(uint serf)
+        {
+            state.FirstKnight = (word)serf;
+            state.Stock[0].Available = (byte)(state.Stock[0].Available + 1);
+        }
+
         public uint FirstKnight
         {
             get => state.FirstKnight;
@@ -2007,10 +2020,16 @@ namespace Freeserf
                 player.DecreaseCastleKnights();
 
                 var serfIndex = state.FirstKnight;
-                var serf = Game.GetSerf(serfIndex);
-                state.FirstKnight = (word)serf.NextKnight;
 
-                serf.StayIdleInStock(state.Inventory);
+                // The knight count could be wrong in save games of older versions (#130).
+                // Then there might be no knight left to send away.
+                if (serfIndex != 0)
+                {
+                    var serf = Game.GetSerf(serfIndex);
+                    state.FirstKnight = (word)serf.NextKnight;
+
+                    serf.StayIdleInStock(state.Inventory);
+                }
             }
 
             if (state.Holder &&
