@@ -16,6 +16,10 @@ Version 2.2.8:
   supplies, and the tutorial orders box shows the current goal. Tutorial 6 adds
   a passive enemy. Ported from freeserf PR #575, #576 and #577.
 - Save games keep the game type, the mission/tutorial level and the winning player
+- Android: the app now supports Android 15+/16 devices with 16 KB memory pages.
+  The Silk.NET SDL native libraries (which were only 4 KB-aligned) are replaced
+  with 16 KB-aligned builds for arm64-v8a and x86_64, removing the XA0141
+  build warning and the load failure on 16 KB-page devices.
 
 
 Version 2.2.7:
