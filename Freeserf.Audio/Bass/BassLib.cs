@@ -68,6 +68,8 @@ namespace Freeserf.Audio.Bass
                 // re-initialization (e.g. after the app was closed and the
                 // activity is recreated on Android). The sound font was reset above.
                 Initialized = false;
+                soundFont = 0;
+                soundFontProcs = null;
             }
         }
 

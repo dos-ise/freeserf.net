@@ -1,16 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Local signing configuration (keystore path, alias, passwords) for the
+       Play Store release build. This file is gitignored; copy
+       signing.local.props.example to signing.local.props and fill in your
+       values. It must set AndroidKeyStore=True, otherwise the SDK signs with
+       the debug keystore and Google Play rejects the package. -->
+  <Import Project="signing.local.props" Condition="Exists('signing.local.props')" />
+
   <PropertyGroup>
     <TargetFramework>net10.0-android</TargetFramework>
-    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationId>net.freeserf.android</ApplicationId>
+    <ApplicationId>com.dossoft.freeserf</ApplicationId>
     <ApplicationTitle>Freeserf</ApplicationTitle>
     <!-- Same version as the desktop app (see Directory.Build.props).
-         The version code must increase with each release: major * 10000 + minor * 100 + patch. -->
+         The version code must increase with each release: major * 10000 + minor * 100 + patch.
+         The code is overridden below to stay higher than any previously built release. -->
     <ApplicationDisplayVersion>$(Version)</ApplicationDisplayVersion>
-    <ApplicationVersion>$([MSBuild]::Add($([MSBuild]::Add($([MSBuild]::Multiply($(FreeserfVersionMajor), 10000)), $([MSBuild]::Multiply($(FreeserfVersionMinor), 100)))), $(FreeserfVersionPatch)))</ApplicationVersion>
+    <ApplicationVersion>20211</ApplicationVersion>
     <RootNamespace>Freeserf.Android</RootNamespace>
     <AssemblyName>FreeserfNet.Android</AssemblyName>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>

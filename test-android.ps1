@@ -22,7 +22,7 @@
     .\test-android.ps1 -WaitSeconds 45
 #>
 param(
-    [string]$Apk = "FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.android-Signed.apk",
+    [string]$Apk = "FreeserfNet.Android\bin\Release\net10.0-android\com.dossoft.freeserf-Signed.apk",
     [int]$WaitSeconds = 30,
     [string]$Adb = "adb"
 )
@@ -40,8 +40,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 & $Adb logcat -c
-& $Adb shell am force-stop net.freeserf.android
-& $Adb shell am start -n net.freeserf.android/crc64bcc776d209640335.MainActivity
+& $Adb shell am force-stop com.dossoft.freeserf
+& $Adb shell am start -n com.dossoft.freeserf/crc64bcc776d209640335.MainActivity
 
 Write-Host "Waiting $WaitSeconds s for app startup..." -ForegroundColor Cyan
 Start-Sleep -Seconds $WaitSeconds

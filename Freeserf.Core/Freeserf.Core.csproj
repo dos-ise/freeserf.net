@@ -6,6 +6,9 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Configurations>Debug;Release;MacDebug;MacRelease;WindowsRelease;WindowsDebug;LinuxRelease;LinuxDebug</Configurations>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- The version is defined centrally in Directory.Build.props.
+         Global.VERSION reads the entry assembly version, which is missing on
+         Android, so it falls back to this assembly's version. -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
