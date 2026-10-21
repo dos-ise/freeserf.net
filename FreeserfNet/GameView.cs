@@ -72,6 +72,7 @@ namespace Freeserf
         public event EventHandler KeyPress;
         public event EventHandler SystemKeyPress;
         public event EventHandler StopDrag;
+        public event EventHandler Wheel;
         public FullscreenRequestHandler FullscreenRequestHandler { get; set; }
         public INetworkDataReceiver NetworkDataReceiver { get; set; }
 
@@ -134,6 +135,7 @@ namespace Freeserf
                     var texture = (layer == Layer.Minimap) ? minimapTextureFactory.GetMinimapTexture() :
                         textureAtlas.GetOrCreate(layer).Texture as Texture;
 
+#if DEBUG
                     try
                     {
                         System.Console.WriteLine($"GameView: layer {layer} texture {texture?.Width}x{texture?.Height} glError={Freeserf.Renderer.State.Gl.GetError()}");
@@ -142,6 +144,7 @@ namespace Freeserf
                     {
                         System.Console.WriteLine("GameView: glError query failed: " + ex.Message);
                     }
+#endif
 
                     var renderLayer = Create(layer, texture,
                         layer == Layer.Gui, // only the gui supports colored rects
@@ -207,6 +210,7 @@ namespace Freeserf
                 }
             }
 
+#if DEBUG
             try
             {
                 System.Console.WriteLine($"GameView: glError after layer creation = {Freeserf.Renderer.State.Gl.GetError()}");
@@ -215,6 +219,7 @@ namespace Freeserf
             {
                 System.Console.WriteLine("GameView: glError query failed: " + ex.Message);
             }
+#endif
 
             gui = new UI.Gui(this, this);
         }
@@ -587,6 +592,18 @@ namespace Freeserf
                 return false;
 
             return RunHandler(DoubleClick, new EventArgs(EventType.DoubleClick, position.X, position.Y, 0, 0, button));
+        }
+
+        // Returns true if the wheel was used by the gui (e.g. to scroll a list).
+        public bool NotifyWheel(int x, int y, int steps)
+        {
+            // transform from screen to view
+            var position = ScreenToView(new Position(x, y));
+
+            if (position == null)
+                return false;
+
+            return RunHandler(Wheel, new EventArgs(EventType.Wheel, position.X, position.Y, 0, steps, Button.None));
         }
 
         public bool NotifySpecialClick(int x, int y)
