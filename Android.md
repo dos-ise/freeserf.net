@@ -47,19 +47,20 @@ Smoke-test the result on a connected device/emulator:
 .\test-android.ps1                  # install, launch, grep logcat for Crash 2
 ```
 
-### Working build command (Windows, .NET SDK 10.0.400, Android workload 36.1.69)
+### Working build command (Windows, .NET SDK 11.0.100-rc.2, Android workload 37.2.0-rc.2)
 
 ```powershell
 $env:MSBUILDDISABLENODEREUSE = 1
 dotnet build FreeserfNet.Android\FreeserfNet.Android.csproj -c Release `
-  -m:1 -nodeReuse:false -p:PublishTrimmed=false -p:RunAOTCompilation=false
+  -m:1 -nodeReuse:false -p:PublishTrimmed=true
 ```
 
-`PublishTrimmed`, `RunAOTCompilation`, and the Ambermoon settings
-(`AndroidLinkMode=None`, `AndroidLinkTool=none`, `AndroidEnableProguard=false`,
-`AndroidEnableR8=false`) are now baked into `FreeserfNet.Android.csproj`, so the
-`-p:` flags are optional. The csproj also force-regenerates the type-registration
-table on every build (see Crash 2 below), so incremental builds are safe.
+`PublishTrimmed` and the Ambermoon settings (`AndroidLinkMode=None`,
+`AndroidLinkTool=none`, `AndroidEnableProguard=false`, `AndroidEnableR8=false`)
+are baked into `FreeserfNet.Android.csproj` (trimming is off by default, enable
+it with `-p:PublishTrimmed=true`). The csproj also force-regenerates the
+type-registration table on every build (see Crash 2 below), so incremental
+builds are safe.
 
 To include an external `SPAE.PA` (bundled into the APK), add
 `-p:FreeserfGameDataPath="D:\path\to\SPAE.PA"` to the build command. Without
@@ -70,16 +71,17 @@ Output APK: `FreeserfNet.Android\bin\Release\net10.0-android\net.freeserf.androi
 (~101 MB with trimming/AOT disabled and data bundled; ~30 MB when trimmed;
 ~4 MB without bundled data).
 
-### Why trimming and AOT are disabled (MSB4018)
+### Trimming and AOT
 
-- MSBuild on this machine **cannot spawn the out-of-proc task host**
-  ("Zugriff verweigert" / access denied). The ILLink `ComputeManagedAssemblies` task
-  hardcodes `TaskFactory="TaskHostFactory"` in `Microsoft.NET.ILLink.targets` (line ~325),
-  which requires the out-of-proc host.
-- Workaround: `-p:PublishTrimmed=false`. AOT requires trimming, so also pass
-  `-p:RunAOTCompilation=false` (otherwise XA1030).
-- Also use `-m:1 -nodeReuse:false` and `$env:MSBUILDDISABLENODEREUSE=1` to avoid
-  node-reuse problems.
+Trimming (`-p:PublishTrimmed=true`) works with .NET SDK 11.0.100-rc.2 and the
+Android workload 37.2.0-rc.2. Earlier SDK/workload versions failed with MSB4018
+("Zugriff verweigert" / access denied) because MSBuild could not spawn the
+out-of-proc task host required by the ILLink `ComputeManagedAssemblies` task
+(`TaskFactory="TaskHostFactory"` in `Microsoft.NET.ILLink.targets`). If MSB4018
+occurs again (e.g. on an older SDK or a machine with antivirus restrictions),
+fall back to `-p:PublishTrimmed=false`. AOT requires trimming, so also pass
+`-p:RunAOTCompilation=false` (otherwise XA1030). Use `-m:1 -nodeReuse:false`
+and `$env:MSBUILDDISABLENODEREUSE=1` to avoid node-reuse problems.
 
 ### `dotnet build` vs `dotnet publish`
 
