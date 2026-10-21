@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.10.12224.181 stable
+VisualStudioVersion = 18.10.12224.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Freeserf.Core", "Freeserf.Core\Freeserf.Core.csproj", "{EEFCF9AA-D472-4B79-AD82-C1871BB60DBA}"
 EndProject
@@ -30,6 +30,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Freeserf.Audio", "Freeserf.Audio\Freeserf.Audio.csproj", "{E7355C62-2C99-48CF-99C9-40AE9EC9886F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeserfNet.Android", "FreeserfNet.Android\FreeserfNet.Android.csproj", "{B2E7E6E1-21FF-E125-0CAD-B8D686BCF317}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Freeserf.Tools", "Freeserf.Tools", "{65E491C4-DFA8-0651-CCBF-25DA2879E1E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PngToSprite", "Freeserf.Tools\PngToSprite\PngToSprite.csproj", "{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -467,9 +471,60 @@ Global
 		{B2E7E6E1-21FF-E125-0CAD-B8D686BCF317}.WindowsRelease|x86.ActiveCfg = Release|Any CPU
 		{B2E7E6E1-21FF-E125-0CAD-B8D686BCF317}.WindowsRelease|x86.Build.0 = Release|Any CPU
 		{B2E7E6E1-21FF-E125-0CAD-B8D686BCF317}.WindowsRelease|x86.Deploy.0 = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Debug|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxDebug|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.LinuxRelease|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacDebug|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.MacRelease|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|x64.ActiveCfg = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|x64.Build.0 = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|x86.ActiveCfg = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.Release|x86.Build.0 = Release|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsDebug|x86.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|Any CPU.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|x64.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|x64.Build.0 = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|x86.ActiveCfg = Debug|Any CPU
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2}.WindowsRelease|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{07F5FE19-4191-40AB-A06D-2F0F6B86DED2} = {65E491C4-DFA8-0651-CCBF-25DA2879E1E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EEF4E2FF-59E8-4CAE-B02E-483B404B59FB}
